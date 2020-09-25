@@ -24,3 +24,5 @@ class vector:
         return vector(self.x / other, self.y / other, self.z / other)
     def normolize(self):
         return self / self.magnitude()
+    def get_cos(self, other):
+        return self.dot_product(other) / (self.magnitude() * other.magnitude())
