@@ -4,7 +4,7 @@ class sphere():
     def __init__(self, center, radius, material):
         self.center = center
         self.radius = radius
-        self.matrial = material
+        self.material = material
     def intersects(self, rey):
         sphere_to_ray = rey.origin - self.center
         a = 1
