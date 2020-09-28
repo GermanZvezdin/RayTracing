@@ -14,6 +14,8 @@ class vector:
         return vector(self.x * other.x, self.y * other.y, self.z * other.z)
     def __rmul__(self, other):
         return vector(self.x * other.x, self.y * other.y, self.z * other.z)
+    def __rmul__(self, other):
+        return vector(self.x * other, self.y * other, self.z * other)
     def __add__(self, other):
         return vector(self.x + other.x, self.y + other.y, self.z + other.z)
     def __sub__(self, other):
@@ -24,5 +26,4 @@ class vector:
         return vector(self.x / other, self.y / other, self.z / other)
     def normolize(self):
         return self / self.magnitude()
-    def get_cos(self, other):
-        return self.dot_product(other) / (self.magnitude() * other.magnitude())
+

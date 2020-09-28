@@ -18,7 +18,7 @@ class sphere():
             if dist > 0:
                 return dist
         return None
-    def get_normal(self, p):
-        return vector(p.x - self.center.x, p.y - self.center.y, p.z - self.center.x)
-         
+
+    def normal(self, surface_point):
+        return (surface_point-self.center).normolize()
     

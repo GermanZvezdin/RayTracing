@@ -2,6 +2,7 @@ from Image import image
 from ray import ray
 from point import point
 from Color import color
+from material import Material
 from vector import vector
 import math
 class RenderEngine:
@@ -26,6 +27,8 @@ class RenderEngine:
                 #print(new_point)
                 rey = ray(camera, new_point)
                 pixels.set_pixel(i, j, self.ray_trace(rey, scene))
+            #progress bar
+            print("{:3.0f}%".format(float(j)/float(height) * 100), end="\r")
         return pixels
     def ray_trace(self, rey, scene):
         colar = color(0, 0, 0)
@@ -35,7 +38,8 @@ class RenderEngine:
             return colar
         
         hit_pos = rey.origin + rey.direction * dist_hit
-        colar = colar + self.color_at(obj_hit, hit_pos, scene, rey)
+        hit_normal = obj_hit.normal(hit_pos)
+        colar = colar + self.color_at(obj_hit, hit_pos, hit_normal, scene)
         return colar
     def find_nearest(self, rey, scene):
         dist_min = None
@@ -46,11 +50,18 @@ class RenderEngine:
                 dist_min = dist
                 obj_hit = obj
         return (dist_min, obj_hit)
-    def color_at(self, obj_hit, hit_pos, scene, rey):
-        normal = obj_hit.get_normal(hit_pos)
-        vec = vector(rey.origin.x - rey.direction.x, rey.origin.y - rey.direction.y, rey.origin.z - rey.direction.z)
-        angle = normal.get_cos(vec)
-        #print(math.acos(angle) * 57.7)
-        #print((1 - math.fabs(math.acos(angle) * 57.7 * 100 / 90)))
-        return obj_hit.material * angle
+    def color_at(self, obj_hit, hit_pos,normal, scene):
+        mat = obj_hit.material
+        obj_color = mat.color_at(hit_pos)
+        specular_k = 1.5
+        to_cam = scene.camera - hit_pos
+        c = mat.ambient * color.from_hex("#000000")
+        for light in scene.lights:
+            to_light = ray(hit_pos, light.position - hit_pos)
+            #Освещение по Ламберту
+            c = c + obj_color * mat.diffuse * max(normal.dot_product(to_light.direction), 0)
+            #Blin-Phong lightinig
+            half_vector = (to_light.direction + to_cam).normolize()
+            c = c + light.color * mat.specular * max(normal.dot_product(half_vector), 0) ** specular_k
+        return c
                 
